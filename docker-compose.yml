@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    restart: unless-stopped
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "3000:3000/tcp"  # first init port
+      - "8080:80/tcp"    # WEB
+    volumes:
+      - ~/appdata/adguard/work:/opt/adguardhome/work
+      - ~/appdata/adguard/conf:/opt/adguardhome/conf
