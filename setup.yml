@@ -1,0 +1,54 @@
+---
+- name: Base settings for Ubuntu Server
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    target_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+
+  tasks:
+    - name: Update system
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install base utilities
+      apt:
+        name:
+          - curl
+          - git
+          - htop
+          - net-tools
+          - micro
+          - ca-certificates
+          - gnupg
+        state: present
+
+    - name: Install Docker
+      shell: curl -fsSL https://get.docker.com | sh
+      args:
+        creates: /usr/bin/docker
+
+    - name: Add user to Docker group
+      user:
+        name: "{{ target_user }}"
+        groups: docker
+        append: yes
+
+    - name: Create folder structure
+      file:
+        path: "/home/{{ target_user }}/appdata/{{ item }}"
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0755'
+      loop:
+        - adguard
+        - transmission
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
