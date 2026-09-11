@@ -45,7 +45,6 @@
         mode: '0755'
       loop:
         - adguard
-        - transmission
 
     - name: Ensure Docker service is running
       systemd:
